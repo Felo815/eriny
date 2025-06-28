@@ -72,22 +72,24 @@
 <body class="light min-h-screen flex flex-col items-center p-4">
 
 <div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
-
     <a href="rena.html">المحادثه</a>
     <a href="felo.html">السجل الطبي</a>
     <a href="mark.html">تذكير الأدوية</a>
     <a href="lola.html">فحص الأعراض</a>
     <a href="fady.html">قاعدة الأدوية</a>
     <a href="you.html">التفاعلات</a>
-  </div>
+</div>
 
-  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
+<div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
     <div class="flex justify-end gap-2 mb-4">
       <button onclick="toggleDarkMode()" id="darkBtn" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
     </div>
 
     <h2 class="text-xl font-bold text-center mb-4">تذكير الأدوية</h2>
     <p class="text-center text-sm mb-4">إدارة مواعيد تناول الأدوية</p>
+
+    <!-- زر تفعيل الإشعارات -->
+    <button onclick="enableNotifications()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 mb-4">🔔 تفعيل الإشعارات</button>
 
     <form onsubmit="event.preventDefault(); setReminder();">
       <label class="font-bold">اسم الدواء</label>
@@ -114,7 +116,7 @@
         + إضافة
       </button>
     </form>
-  </div>
+</div>
 
 <script>
 function toggleDarkMode() {
@@ -132,6 +134,21 @@ function toggleDarkMode() {
   }
 }
 
+// تفعيل الإشعارات
+function enableNotifications() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        alert("✅ تم تفعيل الإشعارات بنجاح، سيتم إرسال إشعار عند وقت الدواء.");
+      } else {
+        alert("❌ لم يتم السماح بالإشعارات.");
+      }
+    });
+  } else {
+    alert("❌ جهازك لا يدعم الإشعارات.");
+  }
+}
+
 function setReminder() {
   const drugName = document.getElementById('drugName').value;
   const time = document.getElementById('time').value;
@@ -145,12 +162,21 @@ function setReminder() {
 
   if (delay > 0) {
     setTimeout(() => {
-      // تشغيل الصوت
-      const audio = new Audio('alarm.mp3'); // أو رابط مباشر لصوت مثل:
-      // const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
-      audio.play();
+      // تشغيل الإشعار
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("💊 تذكير الدواء", {
+          body: `🚨 حان وقت تناول الدواء: ${drugName}`,
+          icon: 'pill.png' // يمكنك إضافة أيقونة مخصصة هنا
+        });
+      } else {
+        alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
+      }
 
-      alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
+      // تشغيل الاهتزاز
+      if ('vibrate' in navigator) {
+        navigator.vibrate([500, 300, 500]);
+      }
+
     }, delay);
 
     alert("✅ تم حفظ التذكير بنجاح!");
@@ -159,7 +185,5 @@ function setReminder() {
   }
 }
 </script>
-
-
 </body>
 </html>
