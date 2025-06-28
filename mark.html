@@ -88,8 +88,8 @@
     <h2 class="text-xl font-bold text-center mb-4">تذكير الأدوية</h2>
     <p class="text-center text-sm mb-4">إدارة مواعيد تناول الأدوية</p>
 
-    <!-- زر تفعيل الإشعارات -->
-    <button onclick="enableNotifications()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 mb-4">🔔 تفعيل الإشعارات</button>
+    <!-- زر تفعيل الاهتزاز -->
+    <button onclick="enableVibration()" class="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600 mb-4">📳 تفعيل الاهتزاز</button>
 
     <form onsubmit="event.preventDefault(); setReminder();">
       <label class="font-bold">اسم الدواء</label>
@@ -119,6 +119,8 @@
 </div>
 
 <script>
+let vibrationEnabled = false;
+
 function toggleDarkMode() {
   const body = document.body;
   const darkBtn = document.getElementById("darkBtn");
@@ -134,18 +136,14 @@ function toggleDarkMode() {
   }
 }
 
-// تفعيل الإشعارات
-function enableNotifications() {
-  if ('Notification' in window) {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        alert("✅ تم تفعيل الإشعارات بنجاح، سيتم إرسال إشعار عند وقت الدواء.");
-      } else {
-        alert("❌ لم يتم السماح بالإشعارات.");
-      }
-    });
+// تفعيل الاهتزاز بشكل يدوي
+function enableVibration() {
+  if ('vibrate' in navigator) {
+    navigator.vibrate([200, 100, 200]);
+    vibrationEnabled = true;
+    alert("✅ تم تفعيل الاهتزاز بنجاح. سيعمل عند وقت التذكير.");
   } else {
-    alert("❌ جهازك لا يدعم الإشعارات.");
+    alert("❌ جهازك لا يدعم الاهتزاز عبر المتصفح.");
   }
 }
 
@@ -162,21 +160,16 @@ function setReminder() {
 
   if (delay > 0) {
     setTimeout(() => {
-      // تشغيل الإشعار
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification("💊 تذكير الدواء", {
-          body: `🚨 حان وقت تناول الدواء: ${drugName}`,
-          icon: 'pill.png' // يمكنك إضافة أيقونة مخصصة هنا
-        });
-      } else {
-        alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
-      }
+      // تشغيل الصوت
+      const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+      audio.play();
 
-      // تشغيل الاهتزاز
-      if ('vibrate' in navigator) {
+      // تشغيل الاهتزاز إن كان مفعل
+      if (vibrationEnabled && 'vibrate' in navigator) {
         navigator.vibrate([500, 300, 500]);
       }
 
+      alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
     }, delay);
 
     alert("✅ تم حفظ التذكير بنجاح!");
@@ -185,5 +178,6 @@ function setReminder() {
   }
 }
 </script>
+
 </body>
 </html>
