@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تحقق من الكود</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --nav-light: #e2e8f0;
+
+      --bg-dark: #1a202c;
+      --box-dark: rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+      --nav-dark: #111827;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="light min-h-screen flex flex-col items-center p-4">
+
+<div class="box p-6 rounded-lg shadow-lg w-full max-w-lg mt-10">
+
+  <div class="flex justify-end gap-2 mb-4">
+    <button type="button" id="darkBtn" onclick="toggleDarkMode()" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
+  </div>
+
+  <h2 class="text-xl font-bold text-center mb-4">أدخل الكود الظاهر أمامك</h2>
+
+  <div id="blurredCode" class="text-3xl tracking-widest text-center blur-sm select-none mb-4">****</div>
+
+  <input type="text" id="userCode" placeholder="ادخل الكود هنا" class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-500 mb-4" />
+
+  <button onclick="verify()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">تحقق</button>
+
+</div>
+
+<script>
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  document.body.classList.toggle('light');
+}
+
+// عرض الكود المغبش
+const code = localStorage.getItem("code") || "0000";
+document.getElementById("blurredCode").textContent = code;
+
+// التحقق من الكود
+function verify() {
+  const input = document.getElementById("userCode").value.trim();
+
+  if (input === code) {
+    window.location.href = "felo.html";
+  } else {
+    alert("❌ الكود غير صحيح");
+  }
+}
+</script>
+</body>
+</html>

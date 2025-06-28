@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محادثة طبية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --nav-light: #e2e8f0;
+
+      --bg-dark: #1a202c;
+      --box-dark: rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+      --nav-dark: #111827;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    .nav-bar {
+      transition: background 0.3s;
+    }
+
+    body.light .nav-bar {
+      background-color: var(--nav-light);
+    }
+
+    body.dark .nav-bar {
+      background-color: var(--nav-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+  </style>
+</head>
+<body class="light min-h-screen flex flex-col items-center p-4">
+
+  <!-- ✅ شريط الصفحات -->
+<div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
+    <a href="rena.html">المحادثه</a>
+    <a href="felo.html">السجل الطبي</a>
+    <a href="mark.html">تذكير الأدوية</a>
+    <a href="lola.html">فحص الأعراض</a>
+    <a href="fady.html">قاعدة الأدوية</a>
+    <a href="you.html">التفاعلات</a>
+
+  </div>
+
+  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <div class="flex justify-end gap-2 mb-4">
+      
+      <button id="darkBtn" onclick="toggleDarkMode()" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
+    </div>
+<br>
+<br>
+    <h2 class="text-xl font-bold text-center mb-4">محادثة طبية </h2>
+    <div class="mb-4">
+      <input id="userInput" type="text" placeholder="اكتب سؤالك هنا..." class="w-full p-2 border rounded" onkeydown="if(event.key==='Enter'){getAnswer()}" />
+    </div>
+    <div id="chatBox" class="space-y-4"></div>
+  </div>
+
+  <script>
+    const qaPairs = {
+      "what is diabetes": "A chronic condition where the body either doesn't produce enough insulin or can't effectively use the insulin it produces, leading to high blood sugar levels.",
+      "what is a common first-line oral medication for type 2 diabetes in egypt": "Metformin (e.g., Glucophage, Cidophage, Amal).",
+      "are there alternatives to metformin for diabetes management in egypt": "Yes, other classes include Sulfonylureas (e.g., Amaryl - glimepiride), DPP-4 inhibitors (e.g., Januvia - sitagliptin, Onglyza - saxagliptin), SGLT2 inhibitors (e.g., Jardiance - empagliflozin, Forxiga - dapagliflozin), and GLP-1 receptor agonists (e.g., Ozempic - semaglutide).",
+      "what is a common drug-drug interaction with metformin": "Contrast dyes used in imaging can cause acute kidney injury, which can lead to lactic acidosis with metformin. It's usually advised to stop metformin before and for a period after these procedures.",
+      "what is a common insulin brand in egypt": "Lantus, Novorapid, Humalog.",
+      "can corticosteroids affect blood sugar levels in diabetic patients": "Yes, corticosteroids can significantly increase blood glucose levels, requiring close monitoring and potential adjustment of diabetes medications.",
+      "what is a common fixed-dose combination drug for diabetes in egypt": "Amaryl M (Glimepiride + Metformin).",
+      "what is a serious interaction to be aware of when using sulfonylureas": "Concomitant use with insulin can increase the risk of severe hypoglycemia.",
+      "what is hypertension (high blood pressure)": "A condition where the long-term force of the blood against your artery walls is high enough that it may eventually cause health problems, such as heart disease.",
+      "what is a common ace inhibitor brand in egypt": "Capoten (captopril), Renitec (enalapril), Ramipril (various generics like Ramicor).",
+      "what are common alternatives to ace inhibitors for hypertension in egypt": "ARBs like Diovan, Cozaar; CCBs like Norvasc, Adalat; Beta-blockers like Concor, Tenormin; and diuretics like Lasix or Hydrochlorothiazide.",
+      "what is a common drug-drug interaction with ace inhibitors": "NSAIDs can reduce the effect and increase kidney risk. Potassium-sparing diuretics increase hyperkalemia risk.",
+      "what is a common calcium channel blocker brand in egypt": "Norvasc, Vascal.",
+      "what is a common beta-blocker brand in egypt": "Concor, Tenormin.",
+      "can grapefruit juice interact with blood pressure medications": "Yes, especially with calcium channel blockers like amlodipine.",
+      "what is a common diuretic used for hypertension in egypt": "Esidrex, Lasix.",
+      "what is hyperlipidemia (high cholesterol)": "Abnormally high levels of lipids in the blood, increasing heart disease risk.",
+      "what is a common statin brand in egypt": "Lipitor, Crestor, Zocor.",
+      "what are common alternatives to statins for hyperlipidemia in egypt": "Ezetrol, fibrates like Lipanthyl, Omega-3.",
+      "what is a common drug-drug interaction with statins": "Antifungals, macrolide antibiotics, and grapefruit juice can increase side effects.",
+      "what is a common brand for ezetimibe in egypt": "Ezetrol.",
+      "what is a common combination drug for hyperlipidemia in egypt": "Vytorin (Simvastatin + Ezetimibe).",
+      "can fibrates be used with statins": "Yes, but risk of muscle problems increases.",
+      "what is constipation": "Infrequent, hard bowel movements.",
+      "what is a common osmotic laxative brand in egypt": "Lactulose, Milk of Magnesia.",
+      "what are common alternatives to osmotic laxatives for constipation in egypt": "Fybogel, Dulcolax, Senna, Egycusate.",
+      "what is a common drug-drug interaction with stimulant laxatives": "Electrolyte imbalance affects heart drugs like digoxin.",
+      "what is a common stool softener brand in egypt": "Egycusate.",
+      "what is the primary non-pharmacological advice for constipation": "Drink fluids and eat more fiber.",
+      "can opioid pain medications cause constipation": "Yes, they commonly cause constipation.",
+      "what is diarrhea": "Frequent, loose stools.",
+      "what is a common anti-motility drug for diarrhea in egypt": "Imodium, Smecta.",
+      "what are common alternatives to loperamide for diarrhea in egypt": "Kapect, Enterogermina, Pepto-Bismol.",
+      "what is a common drug-drug interaction with loperamide": "Some antidepressants and antifungals increase side effects.",
+      "what is a common probiotic brand used for diarrhea in egypt": "Enterogermina, Lacteol Fort.",
+      "what is the most important treatment for diarrhea, regardless of the cause": "Rehydration with ORS.",
+      "should antibiotics always be used for diarrhea": "No, only for bacterial cases by doctor's advice.",
+      "what is a common symptom of a cold that often leads to seeking medication": "Nasal congestion, sore throat, cough, and sneezing.",
+      "what is a common non-drowsy antihistamine for cold symptoms in egypt": "Claritine, Aerius.",
+      "what is a common decongestant brand in egypt": "Sudafed, Otrivin, Normifrin.",
+      "what are common alternatives to oral decongestants for nasal congestion": "Saline sprays, steam inhalation.",
+      "what is a common drug-drug interaction with oral decongestants": "MAO inhibitors and hypertension medications.",
+      "what is a common cough suppressant brand in egypt": "Sinecod, Tussistop.",
+      "what is a common expectorant brand in egypt": "Bronchicum, Mucosol, Bisolvon.",
+      "what is a common combination drug for cold and flu symptoms in egypt": "Panadol Cold & Flu, Congestal.",
+      "what is a common pain reliever and fever reducer used for cold symptoms in egypt": "Panadol, Brufen.",
+      "what is a common drug-drug interaction with paracetamol (acetaminophen)": "Liver toxicity with alcohol or warfarin interaction.",
+      "can cough and cold medications be safely used in young children": "Use caution in children under 6.",
+      "what is the main advice for managing a common cold": "Rest, fluids, and symptom relief.",
+      "what is the difference between a cough suppressant and an expectorant": "Suppressants reduce cough reflex; expectorants loosen mucus."
+    };
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+      document.body.classList.toggle('light');
+      const btn = document.getElementById("darkBtn");
+      btn.innerHTML = document.body.classList.contains("dark") ? "☀️ الوضع العادي" : "🌙 الوضع المظلم";
+    }
+
+    function toggleLanguage() {
+      alert("التبديل بين اللغات غير مفعل في هذه الصفحة حالياً.");
+    }
+
+    function getAnswer() {
+      const input = document.getElementById("userInput").value.trim().toLowerCase();
+      const chat = document.getElementById("chatBox");
+      const userMessage = `<div class='text-right'><span class='font-bold'>أنت:</span> ${input}</div>`;
+      chat.innerHTML += userMessage;
+
+      if (qaPairs[input]) {
+        const botMessage = `<div class='text-left text-green-800'><span class='font-bold'>الرد:</span> ${qaPairs[input]}</div>`;
+        chat.innerHTML += botMessage;
+      } else {
+        const botMessage = `<div class='text-left text-red-800'><span class='font-bold'>الرد:</span> عذراً، لم أجد إجابة لهذا السؤال حالياً.</div>`;
+        chat.innerHTML += botMessage;
+      }
+
+      document.getElementById("userInput").value = "";
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>

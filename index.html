@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title></title> <!-- إزالة العنوان -->
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --bg-dark: #1a202c;
+      --box-dark: rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="light min-h-screen flex flex-col items-center justify-center p-4">
+
+<div class="box p-6 rounded-lg shadow-lg w-full max-w-sm">
+
+  <div class="flex justify-end gap-2 mb-4">
+    <button type="button" id="darkBtn" onclick="toggleDarkMode()" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
+  </div>
+
+  <form id="dataForm" class="space-y-4">
+    <div>
+      <label for="firstName" class="block font-bold mb-1">Frist name </label>
+      <input type="text" id="firstName" class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-500" required />
+    </div>
+    <div>
+      <label for="lastName" class="block font-bold mb-1"> Last name</label>
+      <input type="text" id="lastName" class="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-500" required />
+    </div>
+
+    <button type="button" onclick="goToCodePage()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">التالي</button>
+  </form>
+</div>
+
+<script>
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  document.body.classList.toggle('light');
+}
+
+function goToCodePage() {
+  const fname = document.getElementById("firstName").value.trim();
+  const lname = document.getElementById("lastName").value.trim();
+
+  if (!fname || !lname) {
+    alert("من فضلك أدخل الاسم والاسم العائلي");
+    return;
+  }
+
+  localStorage.setItem("userData", JSON.stringify({ fname, lname }));
+  const randomCode = Math.floor(1000 + Math.random() * 9000).toString();
+  localStorage.setItem("code", randomCode);
+
+  window.location.href = "code.html";
+}
+</script>
+</body>
+</html>

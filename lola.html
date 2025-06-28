@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فحص الأعراض</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --nav-light: #e2e8f0;
+
+      --bg-dark: #1a202c;
+      --box-dark: rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+      --nav-dark: #111827;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    .nav-bar {
+      transition: background 0.3s;
+    }
+
+    body.light .nav-bar {
+      background-color: var(--nav-light);
+    }
+
+    body.dark .nav-bar {
+      background-color: var(--nav-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+  </style>
+</head>
+<body class="light min-h-screen flex flex-col items-center p-4">
+
+<div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
+    <a href="rena.html">المحادثه</a>
+    <a href="felo.html">السجل الطبي</a>
+    <a href="mark.html">تذكير الأدوية</a>
+    <a href="lola.html">فحص الأعراض</a>
+    <a href="fady.html">قاعدة الأدوية</a>
+    <a href="you.html">التفاعلات</a>
+
+  </div>
+
+  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <div class="flex justify-end mb-4">
+      <button onclick="toggleDarkMode()" id="darkBtn" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
+    </div>
+
+    <h2 class="text-xl font-bold text-center mb-2 text-red-400">فحص الأعراض</h2>
+    <p class="text-center text-sm mb-4">اختر الأعراض التي تشعر بها للحصول على تشخيص محتمل</p>
+
+    <form onsubmit="event.preventDefault(); analyzeSymptoms();">
+      <label class="font-bold block mb-2">اختر الأعراض:</label>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <label><input type="checkbox" value="صداع"> صداع</label>
+        <label><input type="checkbox" value="إسهال"> إسهال</label>
+        <label><input type="checkbox" value="سعال"> سعال</label>
+        <label><input type="checkbox" value="حمى"> حمى</label>
+        <label><input type="checkbox" value="التهاب الحلق"> التهاب الحلق</label>
+        <label><input type="checkbox" value="آلام الجسم"> آلام الجسم</label>
+        <label><input type="checkbox" value="غثيان"> غثيان</label>
+        <label><input type="checkbox" value="إرهاق"> إرهاق</label>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">تحليل الأعراض</button>
+        <button type="button" onclick="resetForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">إعادة تعيين</button>
+      </div>
+    </form>
+
+    <div id="result" class="mt-6 text-sm"></div>
+  </div>
+
+  <script>
+    const medicineSuggestions = {
+      "صداع": ["بانادول", "بروفين", "أدفيل"],
+      "إسهال": ["انتينال", "فلاجيل", "ديوسمكت"],
+      "سعال": ["سعالكس", "توسيفان", "برونشيكم"],
+      "حمى": ["باراسيتامول", "بروفين"],
+      "التهاب الحلق": ["ستربسلز", "بيسلفون", "جينوثول"],
+      "آلام الجسم": ["بروفين", "ريلاكسون", "ديكلوفين"],
+      "غثيان": ["موتيليوم", "زانتاك", "درامامين"],
+      "إرهاق": ["فيتامين B12", "ماغنسيوم", "سنتروم"]
+    };
+
+    function analyzeSymptoms() {
+      const checkboxes = document.querySelectorAll("input[type='checkbox']");
+      const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
+      if (selected.length === 0) {
+        resultDiv.innerHTML = "<p class='text-red-500'>الرجاء اختيار عرض واحد على الأقل.</p>";
+        return;
+      }
+
+      let allMedicines = new Set();
+      selected.forEach(symptom => {
+        (medicineSuggestions[symptom] || []).forEach(med => allMedicines.add(med));
+      });
+
+      resultDiv.innerHTML = `
+        <h3 class="font-bold mb-2">🔍 الأعراض المختارة:</h3>
+        <ul class="mb-4 list-disc list-inside text-blue-500">
+          ${selected.map(s => `<li>${s}</li>`).join('')}
+        </ul>
+        <h3 class="font-bold mb-2">💊 أدوية مقترحة:</h3>
+        <ul class="list-disc list-inside text-green-500">
+          ${[...allMedicines].map(m => `<li>${m}</li>`).join('')}
+        </ul>
+      `;
+    }
+
+    function resetForm() {
+      document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+      document.getElementById("result").innerHTML = "";
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      const darkBtn = document.getElementById("darkBtn");
+
+      if (body.classList.contains("light")) {
+        body.classList.remove("light");
+        body.classList.add("dark");
+        darkBtn.textContent = "☀️ الوضع العادي";
+      } else {
+        body.classList.remove("dark");
+        body.classList.add("light");
+        darkBtn.textContent = "🌙 الوضع المظلم";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>فحص تفاعل الأدوية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --nav-light: #e2e8f0;
+
+      --bg-dark: #1a202c;
+      --box-dark: rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+      --nav-dark: #111827;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    .nav-bar {
+      transition: background 0.3s;
+    }
+
+    body.light .nav-bar {
+      background-color: var(--nav-light);
+    }
+
+    body.dark .nav-bar {
+      background-color: var(--nav-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="light min-h-screen flex flex-col items-center p-4">
+
+  <!-- ✅ Navbar -->
+  <div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
+    <a href="rena.html">المحادثه</a>
+    <a href="felo.html">السجل الطبي</a>
+    <a href="mark.html">تذكير الأدوية</a>
+    <a href="lola.html">فحص الأعراض</a>
+    <a href="fady.html">قاعدة الأدوية</a>
+    <a href="you.html">التفاعلات</a>
+  </div>
+
+  <!-- ✅ Dark Mode Toggle -->
+  <div class="flex justify-end gap-2 w-full max-w-lg mb-4">
+    <button onclick="toggleDarkMode()" id="darkBtn" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
+  </div>
+
+
+
+
+
+
+
+
+
+  <!-- ✅ Main Box -->
+  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <h2 class="text-xl font-bold text-center mb-4">فحص تفاعل الأدوية</h2>
+
+    <label class="block font-semibold mb-1">أدخل الدواء الأول:</label>
+    <input id="drug1" type="text" class="w-full border border-gray-300 p-2 rounded mb-3" placeholder="مثال: augmentin" />
+
+    <label class="block font-semibold mb-1">أدخل الدواء الثاني:</label>
+    <input id="drug2" type="text" class="w-full border border-gray-300 p-2 rounded mb-4" placeholder="مثال: flagyl" />
+
+    <button onclick="checkInteraction()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+      تم
+    </button>
+
+    <div id="result" class="mt-4 text-center font-bold text-red-600"></div>
+  </div>
+
+  <!-- ✅ Scripts -->
+  <script>
+    function toggleDarkMode() {
+      const body = document.body;
+      const darkBtn = document.getElementById("darkBtn");
+
+      if (body.classList.contains("light")) {
+        body.classList.remove("light");
+        body.classList.add("dark");
+        darkBtn.textContent = "☀️ الوضع العادي";
+      } else {
+        body.classList.remove("dark");
+        body.classList.add("light");
+        darkBtn.textContent = "🌙 الوضع المظلم";
+      }
+    }
+
+    const drugs = [
+      "augmentin", "suprax", "xithrone", "dalacin c", "tavanic", "ciprofloxacin", "trivid", "gastrobiotic",
+      "kapect susp", "diasmect", "imodium", "lacteol forte", "enterogermina", "antinal", "nanazoxid", "flagyl",
+      "amebazol", "enntocid", "minalax", "prucasoft", "senna lax", "laxeol", "lactulose syrup",
+      "glycerin suppository", "normacol", "femogesal", "microcept", "mozanglie", "cilest", "lactevenor",
+      "cerazette", "hyfresh", "tears guard", "refresh tears", "systane gel", "optipred", "visine", "prisoline",
+      "tobrin", "depzabid", "ciprofar", "co-avazir", "ioprost", "tekliva", "amaryl", "diamicron mr", "actos",
+      "gluconorm", "cidophage", "glaptivia", "galvus", "dapaglif", "diacurimap", "glimet", "dibavally plus",
+      "dapaveldactin plus", "amaglust", "lantus solostar", "apidra solostar", "novorapid", "tresiba"
+    ];
+
+    const interactions = {
+      "augmentin": { "flagyl": "تفاعل خفيف", "suprax": "لا يوجد تفاعل" },
+      "ciprofloxacin": { "antinal": "تفاعل كبير", "flagyl": "تفاعل متوسط" },
+      "flagyl": { "alcohol": "تفاعل خطير", "ciprofloxacin": "تفاعل متوسط" },
+      "amaryl": { "captopril": "تفاعل متوسط", "alcohol": "تفاعل كبير" },
+      "dapaglif": { "lisinopril": "تفاعل خفيف", "ibuprofen": "تفاعل متوسط" },
+      "glaptivia": { "cidophage": "لا يوجد تفاعل" },
+      "normacol": { "iron": "تفاعل خفيف" },
+      "prucasoft": { "warfarin": "تفاعل خفيف" },
+      "cerazette": { "phenytoin": "تفاعل كبير" },
+      "mozanglie": { "carbamazepine": "تفاعل كبير" }
+    };
+
+    function checkInteraction() {
+      const d1 = document.getElementById("drug1").value.trim().toLowerCase();
+      const d2 = document.getElementById("drug2").value.trim().toLowerCase();
+      const result = document.getElementById("result");
+
+      if (!d1 || !d2) {
+        result.textContent = 'من فضلك أدخل كلا الدوائين.';
+        result.className = "mt-4 text-center font-bold text-yellow-600";
+        return;
+      }
+
+      if (d1 === d2) {
+        result.textContent = 'لقد أدخلت نفس الدواء مرتين.';
+        result.className = "mt-4 text-center font-bold text-yellow-600";
+        return;
+      }
+
+      let interaction = null;
+
+      if (interactions[d1] && interactions[d1][d2]) {
+        interaction = interactions[d1][d2];
+      } else if (interactions[d2] && interactions[d2][d1]) {
+        interaction = interactions[d2][d1];
+      }
+
+      if (interaction) {
+        result.textContent = `نتيجة الفحص: يوجد ${interaction}`;
+        result.className = "mt-4 text-center font-bold text-red-600";
+      } else {
+        result.textContent = "لا يوجد تفاعل بين الدوائين.";
+        result.className = "mt-4 text-center font-bold text-green-600";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>قاعدة بيانات الأدوية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --nav-light: #e2e8f0;
+
+      --bg-dark: #1a202c;
+      --box-dark: rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+      --nav-dark: #111827;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+
+    .nav-bar {
+      transition: background 0.3s;
+    }
+
+    body.light .nav-bar {
+      background-color: var(--nav-light);
+    }
+
+    body.dark .nav-bar {
+      background-color: var(--nav-dark);
+    }
+  </style>
+</head>
+<body class="light min-h-screen p-4">
+
+  <!-- ✅ شريط التنقل -->
+<div class="nav-bar w-full max-w-lg mx-auto mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
+
+    <a href="rena.html">المحادثه</a>
+    <a href="felo.html">السجل الطبي</a>
+    <a href="mark.html">تذكير الأدوية</a>
+    <a href="lola.html">فحص الأعراض</a>
+    <a href="fady.html">قاعدة الأدوية</a>
+    <a href="you.html">التفاعلات</a>
+  </div>
+
+  <!-- ✅ المربع الرئيسي -->
+  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto">
+
+    <!-- أزرار التحكم -->
+    <div class="flex justify-end gap-2 mb-4">
+      <button onclick="toggleLanguage()" id="langBtn" class="toggle-btn text-sm px-3 py-1 rounded">English 🌐</button>
+      <button onclick="toggleDarkMode()" id="darkBtn" class="toggle-btn text-sm px-3 py-1 rounded">🌙 الوضع المظلم</button>
+    </div>
+
+    <h2 class="text-xl font-bold mb-2" id="title">قاعدة بيانات الأدوية</h2>
+    <p class="mb-4 text-sm" id="subtitle">ابحث عن الأدوية والمكونات النشطة</p>
+
+    <!-- مربع البحث -->
+    <input type="text" oninput="filterDrugs()" id="searchBox" placeholder="...البحث في الأدوية" class="w-full p-2 rounded border mb-6">
+
+    <!-- عرض النتائج -->
+    <div id="results" class="space-y-4"></div>
+
+    <script>
+      const drugs = [
+        { name_ar: "estohalt", name_en: "estohalt", active: "omeprazole (20mg-40mg)", similar_ar: ["fastcure", "gastroloc"], similar_en: ["fastcure", "gastroloc"], interactions_ar: "digoxin , itraconazal", interactions_en: "digoxin , itraconazal" },
+        { name_ar: "pantoloc", name_en: "pantoloc", active: "pantoprazole (20mg-40mg)", similar_ar: ["controloc", "antopral", "delpanto"], similar_en: ["controloc", "antopral", "delpanto"], interactions_ar: "itraconazol , fluvoxamine , methotrexate", interactions_en: "itraconazol , fluvoxamine , methotrexate" },
+        { name_ar: "esomelodan", name_en: "esomelodan", active: "esomeprazole (20mg-40mg)", similar_ar: ["esomesalix", "esomeprazole eva"], similar_en: ["esomesalix", "esomeprazole eva"], interactions_ar: "levothyroxine , asprin", interactions_en: "levothyroxine , asprin" },
+        { name_ar: "lanzofutal", name_en: "lanzofutal", active: "lasoprazole (15mg-30mg)", similar_ar: ["lantanon", "lansofast", "gastrocure"], similar_en: ["lantanon", "lansofast", "gastrocure"], interactions_ar: "atazanavir , asprin", interactions_en: "atazanavir , asprin" },
+        { name_ar: "doxirazol", name_en: "doxirazol", active: "dexlansoprazole (30mg-60mg)", similar_ar: ["dexawest", "lantopep", "protolans"], similar_en: ["dexawest", "lantopep", "protolans"], interactions_ar: "acalabrutinib , levothyroxine", interactions_en: "acalabrutinib , levothyroxine" },
+        { name_ar: "bepra", name_en: "bepra", active: "rabeprazole (10mg-20mg)", similar_ar: ["burnaway", "pariet"], similar_en: ["burnaway", "pariet"], interactions_ar: "methotrexate , asprin", interactions_en: "methotrexate , asprin" },
+        { name_ar: "betadine غرغرة", name_en: "betadine gargles", active: "povidone iodine", similar_ar: ["iodosept gargel"], similar_en: ["iodosept gargel"], interactions_ar: "rare drug interactions", interactions_en: "rare drug interactions" },
+        { name_ar: "chlorhexidine غرغرة", name_en: "chlorhexidine M.W", active: "chlorhexidine", similar_ar: ["Kylie M.W"], similar_en: ["Kylie M.W"], interactions_ar: "digixin , estradiol", interactions_en: "digixin , estradiol" },
+        { name_ar: "miconaz جل فموي", name_en: "miconaz oral gel", active: "miconazole", similar_ar: ["daktarin oral gel"], similar_en: ["daktarin oral gel"], interactions_ar: "warfarin", interactions_en: "warfarin" },
+        { name_ar: "دواء رقم 2", name_en: "Drug 2", active: "مادة فعالة 2", similar_ar: ["دواء مشابه 2-1", "دواء مشابه 2-2"], similar_en: ["Similar Drug 2-1", "Similar Drug 2-2"], interactions_ar: "تفاعل 2-A، تفاعل 2-B", interactions_en: "Interaction 2-A, Interaction 2-B" },
+        { name_ar: "دواء رقم 3", name_en: "Drug 3", active: "مادة فعالة 3", similar_ar: ["دواء مشابه 3-1", "دواء مشابه 3-2"], similar_en: ["Similar Drug 3-1", "Similar Drug 3-2"], interactions_ar: "تفاعل 3-A، تفاعل 3-B", interactions_en: "Interaction 3-A, Interaction 3-B" },
+        { name_ar: "augmentin", name_en: "augmentin", active: "amoxicillin + clavulanic acid", similar_ar: ["megamox","clavimox","emoxclav","hibiotic","augram","deltaclav"], similar_en: ["megamox","clavimox","emoxclav","hibiotic","augram","deltaclav"], interactions_ar: "allopurinol , methotrexate , حبوب منع الحمل", interactions_en: "allopurinol , methotrexate , oral contraceptive" },
+
+{ name_ar: "suprax", name_en: "suprax", active: "cefixime", similar_ar: ["cefixime","ximacef","flavicef"], similar_en: ["cefixime","ximacef","flavicef"], interactions_ar: "warfarin , carbamazepine , حبوب منع الحمل", interactions_en: "warfarin , carbamazepine , oral contraceptive" },
+
+{ name_ar: "xithrone", name_en: "xithrone", active: "azithromycin (500mg)", similar_ar: ["zithrokan","zithromax","azrolid","epizithro","zithrocin","neozolid"], similar_en: ["zithrokan","zithromax","azrolid","epizithro","zithrocin","neozolid"], interactions_ar: "cyclosporine , digoxin , colchicine , ستاتين", interactions_en: "cyclosporine , digoxin , colchicine , statins" },
+
+{ name_ar: "dalacin c", name_en: "dalacin c", active: "clindamycin (300mg)", similar_ar: ["climdam","clindacine","aflaclindamycin"], similar_en: ["climdam","clindacine","aflaclindamycin"], interactions_ar: "erythromycin , أفيونات , كاولين وبيكتين", interactions_en: "erythromycin , opioids , kaolin pectin antidiarrheal" },
+
+{ name_ar: "tavanic", name_en: "tavanic", active: "levofloxacin (500mg)", similar_ar: ["targo","levanic","levodel","tavacin","tavoniflox"], similar_en: ["targo","levanic","levodel","tavacin","tavoniflox"], interactions_ar: "NSAIDs , كورتيزون , أدوية السكر , مضادات الحموضة", interactions_en: "NSAIDs , corticosteroids , antidiabetics , antacids" },
+
+{ name_ar: "ciprofloxacin", name_en: "ciprofloxacin", active: "ciprofloxacin (250mg, 500mg, 750mg)", similar_ar: ["ciprofar","cipropay","ciprocin","ciproquin","serviflox"], similar_en: ["ciprofar","cipropay","ciprocin","ciproquin","serviflox"], interactions_ar: "منتجات الألبان , theophylline , tizanidine , أدوية تطيل QT", interactions_en: "dairy products , theophylline , tizanidine , QT prolonging agents" },
+
+{ name_ar: "tarivid", name_en: "tarivid", active: "ofloxacin", similar_ar: ["oflox","ofloxacin","tariflox"], similar_en: ["oflox","ofloxacin","tariflox"], interactions_ar: "probenecid , phenytoin , warfarin , theophylline", interactions_en: "probenecid , phenytoin , warfarin , theophylline" },
+
+{ name_ar: "gastrobiotic", name_en: "gastrobiotic", active: "rifaximin", similar_ar: ["dufaximin","idibact","trencedia"], similar_en: ["dufaximin","idibact","trencedia"], interactions_ar: "cyclosporine , warfarin , حبوب منع الحمل", interactions_en: "cyclosporine , warfarin , oral contraceptive" },
+{ name_ar: "kapect", name_en: "kapect", active: "kaolin + pectin", similar_ar: ["pectakol susp"], similar_en: ["pectakol susp"], interactions_ar: "tetracyclines , digoxin , clindamycin , مكملات الحديد , الكينولونات , هرمونات الغدة الدرقية", interactions_en: "tetracyclines , digoxin , clindamycin , iron supplements , quinolone , thyroid hormones" },
+
+{ name_ar: "diasmect", name_en: "diasmect", active: "dioctahedral smectate", similar_ar: ["diomacte", "smecta"], similar_en: ["diomacte", "smecta"], interactions_ar: "quinolone , levothyroxine , tetracyclines , مكملات الحديد , digoxin", interactions_en: "quinolone , levothyroxine , tetracyclines , iron supplements , digoxin" },
+
+{ name_ar: "imodium", name_en: "imodium", active: "loperamide", similar_ar: ["lopranest","motijust","stoprrhea","loperasin"], similar_en: ["lopranest","motijust","stoprrhea","loperasin"], interactions_ar: "مثبطات CYP3A4 , مثبطات P-gp , أدوية نظم القلب , ماكروليد , مثبطات الجهاز العصبي", interactions_en: "CYP3A4 inhibitors , P-glycoprotein inhibitors , antiarrhythmics , macrolides , CNS depressants" },
+
+{ name_ar: "lacteol forte", name_en: "lacteol forte", active: "lactobacillus", similar_ar: ["vertesight"], similar_en: ["vertesight"], interactions_ar: "مضادات حيوية , مثبطات المناعة , مضادات الفطريات", interactions_en: "antibiotics , immunosuppressants , antifungals" },
+
+{ name_ar: "enterogermina", name_en: "enterogermina", active: "bacillus clausii spores", similar_ar: [], similar_en: [], interactions_ar: "مضادات حيوية , مثبطات المناعة , مضادات الفطريات", interactions_en: "antibiotics , immunosuppressants , antifungals" },
+
+{ name_ar: "antinal", name_en: "antinal", active: "nifuroxazide", similar_ar: ["dia-furyl","diax","drotavex","furfuril"], similar_en: ["dia-furyl","diax","drotavex","furfuril"], interactions_ar: "مضاد حيوي فموي , لقاح الروتا الفموي , كحول , البروبيوتيك", interactions_en: "oral antibiotic , live oral vaccine (rotavirus) , alcohol , probiotics" },
+
+{ name_ar: "nanazoxid", name_en: "nanazoxid", active: "nitazoxanide", similar_ar: ["antidiazox","bactrofight","cryptonaz","nitazode"], similar_en: ["antidiazox","bactrofight","cryptonaz","nitazode"], interactions_ar: "وارفارين , فينيتوين , فالبروات , ميثوتريكسات , مثبطات المناعة , لقاحات حية", interactions_en: "warfarin , phenytoin , valproate , methotrexate , immunosuppressants , live vaccines" },
+
+{ name_ar: "flagyl", name_en: "flagyl", active: "metronidazole", similar_ar: ["amrizole","bumexazole","copagaramon","flazole"], similar_en: ["amrizole","bumexazole","copagaramon","flazole"], interactions_ar: "كحول , وارفارين , ديسلفيرام , ليثيوم , فينيتوين , فينوباربيتال , سيكلوسبورين , 5-FU", interactions_en: "alcohol , warfarin , disulfiram , lithium , phenytoin , phenobarbital , cyclosporine , (5-FU)" },
+
+{ name_ar: "amebazol", name_en: "amebazol", active: "secnidazole", similar_ar: ["cipazole","fladazole","eurozole","flagentyl"], similar_en: ["cipazole","fladazole","eurozole","flagentyl"], interactions_ar: "كحول , وارفارين , ديسلفيرام", interactions_en: "alcohol , warfarin , disulfiram" },
+
+{ name_ar: "enntocid", name_en: "enntocid", active: "diiodohydroxyquinoline + phthalylsulfathiazole + streptomycin", similar_ar: ["streptoquin"], similar_en: ["streptoquin"], interactions_ar: "مدرات البول مثل الفوروسيميد , أدوية أمينوغلايكوزيد , حبوب منع الحمل", interactions_en: "loop diuretics (furosemide) , aminoglycosides , oral contraceptives" },
+{ name_ar: "minalax", name_en: "minalax", active: "docusate sodium + bisacodyl", similar_ar: ["dulcolax","bisadyl","laxocodyl suppository"], similar_en: ["dulcolax","bisadyl","laxocodyl suppository"], interactions_ar: "ketoconazole , digoxin", interactions_en: "ketoconazole , digoxin" },
+
+{ name_ar: "prucasoft", name_en: "prucasoft", active: "prucalopride (1mg or 2mg)", similar_ar: ["resolor"], similar_en: ["resolor"], interactions_ar: "warfarin , digoxin , مدرات البول", interactions_en: "warfarin , digoxin , diuretics" },
+
+{ name_ar: "senna lax", name_en: "senna lax", active: "senna glycosides", similar_ar: ["agiolax","senokot"], similar_en: ["agiolax","senokot"], interactions_ar: "حديد", interactions_en: "iron" },
+
+{ name_ar: "laxeol", name_en: "laxeol", active: "sodium picosulphate", similar_ar: ["picolax"], similar_en: ["picolax"], interactions_ar: "مضادات الحموضة , neomycin", interactions_en: "antacid , neomycin" },
+
+{ name_ar: "lactulose syrup", name_en: "lactulose syrup", active: "lactulose", similar_ar: ["duphalac"], similar_en: ["duphalac"], interactions_ar: "لا توجد تفاعلات", interactions_en: "no interaction" },
+
+{ name_ar: "glycerin suppository", name_en: "glycerin suppository", active: "glycerin + gelatin", similar_ar: ["glycerol suppository"], similar_en: ["glycerol suppository"], interactions_ar: "لا توجد تفاعلات", interactions_en: "no interaction" },
+
+{ name_ar: "normacol", name_en: "normacol", active: "fibers", similar_ar: ["normacol plus","fiber plus"], similar_en: ["normacol plus","fiber plus"], interactions_ar: "قبل أو بعد أي دواء بساعتين", interactions_en: "two hours before or after any medication" },
+{ name_ar: "femogesal", name_en: "femogesal", active: "ethinyl estradiol + gestodene", similar_ar: ["gestranil","gynera","lindynette"], similar_en: ["gestranil","gynera","lindynette"], interactions_ar: "phenytoin , phenobarbital , iverzine", interactions_en: "phenytoin , phenobarbital , iverzine" },
+
+{ name_ar: "microcept", name_en: "microcept", active: "ethinyl estradiol + levonorgestrel", similar_ar: ["nordette","triocept"], similar_en: ["nordette","triocept"], interactions_ar: "ampicillin , tetracycline , phenobarbital", interactions_en: "ampicillin , tetracycline , phenobarbital" },
+
+{ name_ar: "mozanglie", name_en: "mozanglie", active: "ethinyl estradiol + drospirenone", similar_ar: ["norocarmena","radrosa","yasmin"], similar_en: ["norocarmena","radrosa","yasmin"], interactions_ar: "carbamazepine , prednisolone , tetracycline", interactions_en: "carbamazepine , prednisolone , tetracycline" },
+
+{ name_ar: "cilest", name_en: "cilest", active: "ethinyl estradiol + norgestimate", similar_ar: ["norgstadiol"], similar_en: ["norgstadiol"], interactions_ar: "acetaminophen , amoxacillin , phenytoin", interactions_en: "acetaminophen , amoxacillin , phenytoin" },
+
+{ name_ar: "lactevenor", name_en: "lactevenor", active: "levonorgestrel", similar_ar: ["microlut"], similar_en: ["microlut"], interactions_ar: "barbiturates , phenytoin , carbamazepine", interactions_en: "barbiturates , phenytoin , carbamazepine" },
+
+{ name_ar: "cerazette", name_en: "cerazette", active: "desogestrel", similar_ar: ["ovunhipita"], similar_en: ["ovunhipita"], interactions_ar: "carbamazepine , phenytoin , iverzine", interactions_en: "carbamazepine , phenytoin , iverzine" },
+{ name_ar: "hyfresh", name_en: "hyfresh", active: "sodium hyaluronate", similar_ar: ["polyfresh","xiloial","solofresh"], similar_en: ["polyfresh","xiloial","solofresh"], interactions_ar: "لا توجد تفاعلات معروفة", interactions_en: "no known interactions" },
+
+{ name_ar: "tears guard", name_en: "tears guard", active: "hydroxypropyl methylcellulose", similar_ar: ["artelac","optiguard"], similar_en: ["artelac","optiguard"], interactions_ar: "لا توجد تفاعلات معروفة", interactions_en: "no known interactions" },
+
+{ name_ar: "refresh tears", name_en: "refresh tears", active: "sodium carboxymethylcellulose", similar_ar: ["lacritears","pharma tears"], similar_en: ["lacritears","pharma tears"], interactions_ar: "لا توجد تفاعلات معروفة", interactions_en: "no known interactions" },
+
+{ name_ar: "systane gel", name_en: "systane gel", active: "polyethylene glycol", similar_ar: ["systane ultra"], similar_en: ["systane ultra"], interactions_ar: "لا توجد تفاعلات معروفة", interactions_en: "no known interactions" },
+
+{ name_ar: "optipred", name_en: "optipred", active: "prednisolone", similar_ar: ["orchapred","pharmapred"], similar_en: ["orchapred","pharmapred"], interactions_ar: "استعمال طويل قد يسبب ارتفاع ضغط العين", interactions_en: "prolonged use may raise intraocular pressure" },
+
+{ name_ar: "visine", name_en: "visine", active: "tetrahydrozoline", similar_ar: ["occuzoline"], similar_en: ["occuzoline"], interactions_ar: "لا تستخدم مع الجلوكوما مغلقة الزاوية", interactions_en: "not for use in angle-closure glaucoma" },
+
+{ name_ar: "prisoline", name_en: "prisoline", active: "naphazoline + pheniramine", similar_ar: ["nostamine","optozoline"], similar_en: ["nostamine","optozoline"], interactions_ar: "قد تتفاعل مع مضادات الاكتئاب", interactions_en: "may interact with antidepressants" },
+
+{ name_ar: "tobrin", name_en: "tobrin", active: "tobramycin", similar_ar: ["tobral","tobrex"], similar_en: ["tobral","tobrex"], interactions_ar: "لا توجد تفاعلات مهمة", interactions_en: "no major interactions" },
+
+{ name_ar: "depzabid", name_en: "depzabid", active: "moxifloxacin", similar_ar: ["fortymox","idelox","vigamox"], similar_en: ["fortymox","idelox","vigamox"], interactions_ar: "لا تستخدم مع العدسات اللاصقة", interactions_en: "do not use with contact lenses" },
+
+{ name_ar: "ciprofar", name_en: "ciprofar", active: "ciprofloxacin", similar_ar: ["ciprocin","ciprocort"], similar_en: ["ciprocin","ciprocort"], interactions_ar: "لا توجد تفاعلات مهمة", interactions_en: "no major interactions" },
+
+{ name_ar: "co-avazir", name_en: "co-avazir", active: "dexamethasone + tobramycin", similar_ar: ["dexatob","dexatrobin","tobradex"], similar_en: ["dexatob","dexatrobin","tobradex"], interactions_ar: "استعمال طويل قد يسبب زيادة ضغط العين", interactions_en: "long-term use may increase intraocular pressure" },
+
+{ name_ar: "ioprost", name_en: "ioprost", active: "latanoprost", similar_ar: ["xalatan","latanoswix"], similar_en: ["xalatan","latanoswix"], interactions_ar: "قد يسبب اسمرار القزحية", interactions_en: "may cause iris pigmentation" },
+
+{ name_ar: "tekliva", name_en: "tekliva", active: "travoprost", similar_ar: ["travonorm","travatan"], similar_en: ["travonorm","travatan"], interactions_ar: "قد يسبب تغيير لون العين", interactions_en: "may change eye color" },
+{ name_ar: "amaryl", name_en: "amaryl", active: "glimepiride (1-2-3-4-6 mg)", similar_ar: ["diabenor","diabeto","dolcyl","glaryl"], similar_en: ["diabenor","diabeto","dolcyl","glaryl"], interactions_ar: "الكحول , ليفوثيروكسين , فيوروسيمايد", interactions_en: "alcohol , levothyroxine , furosemide" },
+
+{ name_ar: "diamicron mr", name_en: "diamicron mr", active: "gliclazide (30-40-60-80 mg)", similar_ar: ["controbetic","diabetron","diabyl"], similar_en: ["controbetic","diabetron","diabyl"], interactions_ar: "وارفارين , كابتوبريل , حبوب منع الحمل", interactions_en: "warfarin , captopril , contraceptive" },
+
+{ name_ar: "actos", name_en: "actos", active: "pioglitazone (15-30-45 mg)", similar_ar: ["diabetin","glitazen","hi glitazone"], similar_en: ["diabetin","glitazen","hi glitazone"], interactions_ar: "حبوب منع الحمل , ميدازولام , ريفامبيسين", interactions_en: "contraceptive , midazolam , rifampicin" },
+
+{ name_ar: "gluconorm", name_en: "gluconorm", active: "repaglinide (0.5-1-2 mg)", similar_ar: ["diarol","novonorm","repaglide"], similar_en: ["diarol","novonorm","repaglide"], interactions_ar: "مثبطات أنجيوتنسين 2", interactions_en: "angiotensin 2 inhibitors" },
+
+{ name_ar: "cidophage", name_en: "cidophage", active: "metformin (500-850-1000 mg)", similar_ar: ["glucophage","mepaphage"], similar_en: ["glucophage","mepaphage"], interactions_ar: "فيوروسيمايد , توبيراميت , أسيتازولاميد", interactions_en: "furosemide , topiramate , acetazolamide" },
+
+{ name_ar: "glaptivia", name_en: "glaptivia", active: "sitagliptin (50-100 mg)", similar_ar: ["januvia"], similar_en: ["januvia"], interactions_ar: "ديجوكسين", interactions_en: "digoxin" },
+
+{ name_ar: "galvus", name_en: "galvus", active: "vildagliptin (50 mg)", similar_ar: ["dibavally","gliptus","sugarlo","vildaglip"], similar_en: ["dibavally","gliptus","sugarlo","vildaglip"], interactions_ar: "مثبطات أنجيوتنسين 2", interactions_en: "angiotensin 2 inhibitors" },
+
+{ name_ar: "dapaglif", name_en: "dapaglif", active: "dapagliflozin (5-10 mg)", similar_ar: ["dapablix","diglifloz","forflozin","forxiga"], similar_en: ["dapablix","diglifloz","forflozin","forxiga"], interactions_ar: "كلورثيازيد , ليسينوبريل , إيبوبروفين", interactions_en: "chlorothiazide , lisinopril , ibuprofen" },
+
+{ name_ar: "diacurimap", name_en: "diacurimap", active: "empagliflozin (10-25 mg)", similar_ar: ["empacoza","mellitofix"], similar_en: ["empacoza","mellitofix"], interactions_ar: "مدرات البول", interactions_en: "diuretics" },
+
+{ name_ar: "glimet", name_en: "glimet", active: "metformin + glibenclamide (2.5/500 - 5/500 - 100)", similar_ar: ["glucovance","glucokan","glybofen"], similar_en: ["glucovance","glucokan","glybofen"], interactions_ar: "وارفارين , كلورثيازيد", interactions_en: "warfarin , chlorothiazide" },
+
+{ name_ar: "dibavally plus", name_en: "dibavally plus", active: "metformin + vildagliptin (50/500-850-1000)", similar_ar: ["galvus met","gliptus plus","sugarlo plus"], similar_en: ["galvus met","gliptus plus","sugarlo plus"], interactions_ar: "بريدنيزولون , كلورثيازيد", interactions_en: "prednisolone , chlorothiazide" },
+
+{ name_ar: "dapaveldactin plus", name_en: "dapaveldactin plus", active: "metformin + dapagliflozin (5-10/850-1000)", similar_ar: ["dapablix met","diaflozimet","forflozin plus","xigduo"], similar_en: ["dapablix met","diaflozimet","forflozin plus","xigduo"], interactions_ar: "سيميتيدين , حبوب منع الحمل , فينيتوين", interactions_en: "cimetidine , contraceptive , phenytoin" },
+
+{ name_ar: "amaglust", name_en: "amaglust", active: "pioglitazone + glimepiride (2/30 - 4/30)", similar_ar: ["glimepride plus","zanoglide"], similar_en: ["glimepride plus","zanoglide"], interactions_ar: "الكحول , ليفوثيروكسين , فيوروسيمايد , فوراسميد", interactions_en: "alcohol , levothyroxine , furosemide , furasmide" },
+
+{ name_ar: "lantus solostar", name_en: "lantus solostar", active: "insulin glargine", similar_ar: ["toujeo"], similar_en: ["toujeo"], interactions_ar: "كورتيزون , حبوب منع الحمل , مدرات البول", interactions_en: "corticosteroid , contraceptive , diuretics" },
+
+{ name_ar: "apidra solostar", name_en: "apidra solostar", active: "insulin glulisine", similar_ar: [], similar_en: [], interactions_ar: "كورتيزون , حبوب منع الحمل , مدرات البول", interactions_en: "corticosteroid , contraceptive , diuretics" },
+
+{ name_ar: "novorapid", name_en: "novorapid", active: "insulin aspart", similar_ar: [], similar_en: [], interactions_ar: "كورتيزون , حبوب منع الحمل , مدرات البول", interactions_en: "corticosteroid , contraceptive , diuretics" },
+
+{ name_ar: "tresiba", name_en: "tresiba", active: "insulin degludec", similar_ar: [], similar_en: [], interactions_ar: "isocarboxide", interactions_en: "isocarboxide" }
+
+
+
+
+
+
+      ];
+
+      let isArabic = true;
+      let isDark = false;
+
+      function toggleLanguage() {
+        isArabic = !isArabic;
+        document.body.dir = isArabic ? "rtl" : "ltr";
+        document.getElementById("langBtn").innerText = isArabic ? "English 🌐" : "العربية 🌐";
+        document.getElementById("title").innerText = isArabic ? "قاعدة بيانات الأدوية" : "Drug Database";
+        document.getElementById("subtitle").innerText = isArabic ? "ابحث عن الأدوية والمكونات النشطة" : "Search for drugs and active ingredients";
+        document.getElementById("searchBox").placeholder = isArabic ? "...البحث في الأدوية" : "Search drugs...";
+        filterDrugs();
+      }
+
+      function toggleDarkMode() {
+        isDark = !isDark;
+        document.body.classList.toggle("dark", isDark);
+        document.body.classList.toggle("light", !isDark);
+        document.getElementById("darkBtn").innerText = isDark ? "☀️ الوضع العادي" : "🌙 الوضع المظلم";
+      }
+
+      function filterDrugs() {
+        const query = document.getElementById("searchBox").value.toLowerCase();
+        const container = document.getElementById("results");
+        container.innerHTML = "";
+
+        const filtered = drugs.filter(d =>
+          (isArabic ? d.name_ar : d.name_en).toLowerCase().includes(query)
+        );
+
+        filtered.forEach(d => {
+          const box = document.createElement("div");
+          box.className = "box p-4 rounded shadow border";
+          box.innerHTML = `
+            <h3 class="text-lg font-bold mb-2">${isArabic ? d.name_ar : d.name_en}</h3>
+            <p><strong>${isArabic ? "المكون النشط" : "Active Ingredient"}:</strong> ${d.active}</p>
+            <p class="mt-2"><strong>${isArabic ? "الأدوية المشابهة" : "Similar Drugs"}:</strong> ${(isArabic ? d.similar_ar : d.similar_en).join(", ")}</p>
+            <p class="mt-2 text-red-600"><strong>${isArabic ? "التفاعلات الدوائية" : "Drug Interactions"}:</strong> ${isArabic ? d.interactions_ar : d.interactions_en}</p>
+          `;
+          container.appendChild(box);
+        });
+      }
+
+      window.onload = filterDrugs;
+    </script>
+  </div>
+</body>
+</html>

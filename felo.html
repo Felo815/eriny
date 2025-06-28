@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>السجل الطبي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --box-light: white;
+      --text-light: #1e3a8a;
+      --nav-light: #e2e8f0;
+
+      --bg-dark: #1a202c;
+      --box-dark:rgb(2, 9, 21);
+      --text-dark: #f9fafb;
+      --nav-dark: #111827;
+    }
+
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .box {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .box {
+      background-color: var(--box-light);
+      color: var(--text-light);
+    }
+
+    body.dark .box {
+      background-color: var(--box-dark);
+      color: var(--text-dark);
+    }
+
+    #bmiBox {
+background-color: #e0f2fe;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    body.dark #bmiBox {
+              background-color: #4a5568;
+
+      color: white;
+    }
+
+    .nav-bar {
+      transition: background 0.3s;
+    }
+
+    body.light .nav-bar {
+      background-color: var(--nav-light);
+    }
+
+    body.dark .nav-bar {
+      background-color: var(--nav-dark);
+    }
+
+    .toggle-btn {
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.light .toggle-btn {
+      background-color: #e5e7eb;
+      color: #1e3a8a;
+    }
+
+    body.dark .toggle-btn {
+      background-color: #4b5563;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="light min-h-screen flex flex-col items-center p-4">
+
+  <!-- ✅ شريط الصفحات -->
+<div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
+    <a href="rena.html">المحادثه</a>
+    <a href="felo.html">السجل الطبي</a>
+    <a href="mark.html">تذكير الأدوية</a>
+    <a href="lola.html">فحص الأعراض</a>
+    <a href="fady.html">قاعدة الأدوية</a>
+    <a href="you.html">التفاعلات</a>
+  </div>
+
+  <!-- ✅ مربع البيانات - عرضه أكبر -->
+  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
+
+    <!-- ✅ زر اللغة والوضع المظلم -->
+    <div class="flex justify-end gap-2 mb-4">
+      <button type="button" id="langBtn" onclick="toggleLanguage()" class="toggle-btn px-3 py-1 rounded text-sm">English 🌐</button>
+      <button type="button" id="darkBtn" onclick="toggleDarkMode()" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
+    </div>
+
+  <!-- ✅ صورة الطبيب -->
+<div class="text-center mb-4">
+  <div class="w-14 h-14 mx-auto rounded-full overflow-hidden">
+    <img src="/static/doctor.png" alt="طبيب" class="w-full h-full object-cover">
+  </div>
+</div>
+
+
+    <h2 id="title" class="text-xl font-bold text-center mb-2">السجل الطبي للمريض</h2>
+    <p id="subtitle" class="text-center text-sm mb-4">أدخل بيانات المريض الأساسية</p>
+
+    <form id="medicalForm" onsubmit="event.preventDefault();">
+      <label id="nameLabel" class="font-bold">اسم المريض</label>
+      <input type="text" class="w-full p-2 border rounded mb-3" id="name" placeholder="اكتب اسم المريض" required />
+
+      <div class="flex gap-2 mb-3">
+        <div class="w-1/2">
+          <label id="genderLabel" class="font-bold">النوع</label>
+          <select class="w-full p-2 border rounded" id="gender">
+            <option>ذكر</option>
+            <option>أنثى</option>
+          </select>
+        </div>
+
+        <div class="w-1/2">
+          <label id="ageLabel" class="font-bold">العمر (سنة)</label>
+          <input type="number" class="w-full p-2 border rounded" id="age" min="0" />
+        </div>
+      </div>
+
+      <div class="flex gap-2 mb-3">
+        <div class="w-1/2">
+          <label id="weightLabel" class="font-bold">الوزن (كجم)</label>
+          <input type="number" class="w-full p-2 border rounded" id="weight" min="1" oninput="calculateBMI()" />
+        </div>
+
+        <div class="w-1/2">
+          <label id="heightLabel" class="font-bold">الطول (سم)</label>
+          <input type="number" class="w-full p-2 border rounded" id="height" min="1" oninput="calculateBMI()" />
+        </div>
+      </div>
+
+      <div id="bmiBox">مؤشر كتلة الجسم: --</div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 mt-4 rounded hover:bg-blue-700">
+        حفظ البيانات
+      </button>
+    </form>
+  </div>
+
+  <script>
+    let isArabic = true;
+    let isDark = false;
+
+    function calculateBMI() {
+      const weight = parseFloat(document.getElementById("weight").value);
+      const height = parseFloat(document.getElementById("height").value);
+      const bmiBox = document.getElementById("bmiBox");
+
+      if (!isNaN(weight) && !isNaN(height) && height > 0) {
+        const bmi = (weight / ((height / 100) ** 2)).toFixed(1);
+        bmiBox.textContent = (isArabic ? "مؤشر كتلة الجسم: " : "BMI: ") + bmi;
+      } else {
+        bmiBox.textContent = isArabic ? "مؤشر كتلة الجسم: --" : "BMI: --";
+      }
+    }
+
+    function toggleDarkMode() {
+      const body = document.body;
+      const darkBtn = document.getElementById("darkBtn");
+
+      isDark = !isDark;
+
+      if (isDark) {
+        body.classList.remove("light");
+        body.classList.add("dark");
+        darkBtn.innerHTML = "☀️ الوضع العادي";
+      } else {
+        body.classList.remove("dark");
+        body.classList.add("light");
+        darkBtn.innerHTML = "🌙 الوضع المظلم";
+      }
+    }
+
+    function toggleLanguage() {
+      isArabic = !isArabic;
+      document.dir = isArabic ? "rtl" : "ltr";
+
+      document.getElementById("title").textContent = isArabic ? "السجل الطبي للمريض" : "Patient Medical Record";
+      document.getElementById("subtitle").textContent = isArabic ? "أدخل بيانات المريض الأساسية" : "Enter patient’s basic info";
+      document.getElementById("nameLabel").textContent = isArabic ? "اسم المريض" : "Patient Name";
+      document.getElementById("genderLabel").textContent = isArabic ? "النوع" : "Gender";
+      document.getElementById("ageLabel").textContent = isArabic ? "العمر (سنة)" : "Age";
+      document.getElementById("weightLabel").textContent = isArabic ? "الوزن (كجم)" : "Weight (kg)";
+      document.getElementById("heightLabel").textContent = isArabic ? "الطول (سم)" : "Height (cm)";
+      document.querySelector("button[type='submit']").textContent = isArabic ? "حفظ البيانات" : "Save Data";
+      calculateBMI();
+    }
+  </script>
+</body>
+</html>
