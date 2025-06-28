@@ -116,43 +116,50 @@
     </form>
   </div>
 
-  <script>
-    function toggleDarkMode() {
-      const body = document.body;
-      const darkBtn = document.getElementById("darkBtn");
+<script>
+function toggleDarkMode() {
+  const body = document.body;
+  const darkBtn = document.getElementById("darkBtn");
 
-      if (body.classList.contains("light")) {
-        body.classList.remove("light");
-        body.classList.add("dark");
-        darkBtn.textContent = "☀️ الوضع العادي";
-      } else {
-        body.classList.remove("dark");
-        body.classList.add("light");
-        darkBtn.textContent = "🌙 الوضع المظلم";
-      }
-    }
+  if (body.classList.contains("light")) {
+    body.classList.remove("light");
+    body.classList.add("dark");
+    darkBtn.textContent = "☀️ الوضع العادي";
+  } else {
+    body.classList.remove("dark");
+    body.classList.add("light");
+    darkBtn.textContent = "🌙 الوضع المظلم";
+  }
+}
 
-    function setReminder() {
-      const drugName = document.getElementById('drugName').value;
-      const time = document.getElementById('time').value;
+function setReminder() {
+  const drugName = document.getElementById('drugName').value;
+  const time = document.getElementById('time').value;
 
-      const now = new Date();
-      const [hours, minutes] = time.split(":").map(Number);
-      const reminderTime = new Date();
-      reminderTime.setHours(hours, minutes, 0, 0);
+  const now = new Date();
+  const [hours, minutes] = time.split(":").map(Number);
+  const reminderTime = new Date();
+  reminderTime.setHours(hours, minutes, 0, 0);
 
-      const delay = reminderTime.getTime() - now.getTime();
+  const delay = reminderTime.getTime() - now.getTime();
 
-      if (delay > 0) {
-        setTimeout(() => {
-          alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
-        }, delay);
-        alert("✅ تم حفظ التذكير بنجاح!");
-      } else {
-        alert("❌ الوقت المحدد قد مضى! الرجاء اختيار وقت لاحق.");
-      }
-    }
-  </script>
+  if (delay > 0) {
+    setTimeout(() => {
+      // تشغيل الصوت
+      const audio = new Audio('alarm.mp3'); // أو رابط مباشر لصوت مثل:
+      // const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
+      audio.play();
+
+      alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
+    }, delay);
+
+    alert("✅ تم حفظ التذكير بنجاح!");
+  } else {
+    alert("❌ الوقت المحدد قد مضى! الرجاء اختيار وقت لاحق.");
+  }
+}
+</script>
+
 
 </body>
 </html>
