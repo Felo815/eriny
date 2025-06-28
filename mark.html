@@ -72,24 +72,22 @@
 <body class="light min-h-screen flex flex-col items-center p-4">
 
 <div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
+
     <a href="rena.html">المحادثه</a>
     <a href="felo.html">السجل الطبي</a>
     <a href="mark.html">تذكير الأدوية</a>
     <a href="lola.html">فحص الأعراض</a>
     <a href="fady.html">قاعدة الأدوية</a>
     <a href="you.html">التفاعلات</a>
-</div>
+  </div>
 
-<div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
+  <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
     <div class="flex justify-end gap-2 mb-4">
       <button onclick="toggleDarkMode()" id="darkBtn" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
     </div>
 
     <h2 class="text-xl font-bold text-center mb-4">تذكير الأدوية</h2>
     <p class="text-center text-sm mb-4">إدارة مواعيد تناول الأدوية</p>
-
-    <!-- زر تفعيل الاهتزاز -->
-    <button onclick="enableVibration()" class="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600 mb-4">📳 تفعيل الاهتزاز</button>
 
     <form onsubmit="event.preventDefault(); setReminder();">
       <label class="font-bold">اسم الدواء</label>
@@ -116,68 +114,45 @@
         + إضافة
       </button>
     </form>
-</div>
+  </div>
 
-<script>
-let vibrationEnabled = false;
+  <script>
+    function toggleDarkMode() {
+      const body = document.body;
+      const darkBtn = document.getElementById("darkBtn");
 
-function toggleDarkMode() {
-  const body = document.body;
-  const darkBtn = document.getElementById("darkBtn");
-
-  if (body.classList.contains("light")) {
-    body.classList.remove("light");
-    body.classList.add("dark");
-    darkBtn.textContent = "☀️ الوضع العادي";
-  } else {
-    body.classList.remove("dark");
-    body.classList.add("light");
-    darkBtn.textContent = "🌙 الوضع المظلم";
-  }
-}
-
-// تفعيل الاهتزاز بشكل يدوي
-function enableVibration() {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([200, 100, 200]);
-    vibrationEnabled = true;
-    alert("✅ تم تفعيل الاهتزاز بنجاح. سيعمل عند وقت التذكير.");
-  } else {
-    alert("❌ جهازك لا يدعم الاهتزاز عبر المتصفح.");
-  }
-}
-
-function setReminder() {
-  const drugName = document.getElementById('drugName').value;
-  const time = document.getElementById('time').value;
-
-  const now = new Date();
-  const [hours, minutes] = time.split(":").map(Number);
-  const reminderTime = new Date();
-  reminderTime.setHours(hours, minutes, 0, 0);
-
-  const delay = reminderTime.getTime() - now.getTime();
-
-  if (delay > 0) {
-    setTimeout(() => {
-      // تشغيل الصوت
-      const audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
-      audio.play();
-
-      // تشغيل الاهتزاز إن كان مفعل
-      if (vibrationEnabled && 'vibrate' in navigator) {
-        navigator.vibrate([500, 300, 500]);
+      if (body.classList.contains("light")) {
+        body.classList.remove("light");
+        body.classList.add("dark");
+        darkBtn.textContent = "☀️ الوضع العادي";
+      } else {
+        body.classList.remove("dark");
+        body.classList.add("light");
+        darkBtn.textContent = "🌙 الوضع المظلم";
       }
+    }
 
-      alert(`🚨 حان وقت تناول الدواء: ${drugName}`);
-    }, delay);
+    function setReminder() {
+      const drugName = document.getElementById('drugName').value;
+      const time = document.getElementById('time').value;
 
-    alert("✅ تم حفظ التذكير بنجاح!");
-  } else {
-    alert("❌ الوقت المحدد قد مضى! الرجاء اختيار وقت لاحق.");
-  }
-}
-</script>
+      const now = new Date();
+      const [hours, minutes] = time.split(":").map(Number);
+      const reminderTime = new Date();
+      reminderTime.setHours(hours, minutes, 0, 0);
+
+      const delay = reminderTime.getTime() - now.getTime();
+
+      if (delay > 0) {
+        setTimeout(() => {
+          alert(🚨 حان وقت تناول الدواء: ${drugName});
+        }, delay);
+        alert("✅ تم حفظ التذكير بنجاح!");
+      } else {
+        alert("❌ الوقت المحدد قد مضى! الرجاء اختيار وقت لاحق.");
+      }
+    }
+  </script>
 
 </body>
 </html>
