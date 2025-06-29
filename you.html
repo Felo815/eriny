@@ -73,27 +73,19 @@
 <body class="light min-h-screen flex flex-col items-center p-4">
 
   <!-- ✅ Navbar -->
-  <div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-sm">
-    <a href="rena.html">المحادثه</a>
-    <a href="felo.html">السجل الطبي</a>
-    <a href="mark.html">تذكير الأدوية</a>
-    <a href="lola.html">فحص الأعراض</a>
-    <a href="fady.html">قاعدة الأدوية</a>
-    <a href="you.html">التفاعلات</a>
+  <div class="nav-bar w-full max-w-lg mb-4 p-2 rounded flex justify-around font-bold text-blue-800 text-xs">
+    <a href="{{ url_for('rena') }}">المحادثه</a>
+    <a href="{{ url_for('felo') }}">السجل الطبي</a>
+    <a href="{{ url_for('mark') }}">تذكير الأدوية</a>
+    <a href="{{ url_for('lola') }}">فحص الأعراض</a>
+    <a href="{{ url_for('fady') }}">قاعدة الأدوية</a>
+    <a href="{{ url_for('index') }}">التفاعلات</a>
   </div>
 
   <!-- ✅ Dark Mode Toggle -->
   <div class="flex justify-end gap-2 w-full max-w-lg mb-4">
     <button onclick="toggleDarkMode()" id="darkBtn" class="toggle-btn px-3 py-1 rounded text-sm">🌙 الوضع المظلم</button>
   </div>
-
-
-
-
-
-
-
-
 
   <!-- ✅ Main Box -->
   <div class="box p-6 rounded-lg shadow-lg w-full max-w-lg">
